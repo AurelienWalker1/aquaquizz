@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import logo from "../assets/logo.png";
 
-const API_BASE = "http://192.168.1.19:5001";
+const API_BASE = "https://aquaquizz-backend.onrender.com";
 
 function RegisterPage({ onRegister }) {
 

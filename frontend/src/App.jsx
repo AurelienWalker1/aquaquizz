@@ -15,7 +15,7 @@ import RankingPage from "./pages/RankingPage";
 import AdminPage from "./pages/AdminPage";
 import LivePage from "./pages/LivePage";
 
-const API_BASE = "http://192.168.1.19:5001";
+const API_BASE = "https://aquaquizz-backend.onrender.com";
 
 function App() {
   const [player, setPlayer] = useState(null);

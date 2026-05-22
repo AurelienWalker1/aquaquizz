@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import logo from "../assets/logo.png";
 
-const API_BASE = "http://192.168.1.19:5001";
+const API_BASE = "https://aquaquizz-backend.onrender.com";
 
 function QuestionPage({ player }) {
   const { number } = useParams();
