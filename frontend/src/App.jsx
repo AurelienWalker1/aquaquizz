@@ -93,7 +93,10 @@ function App() {
     <BrowserRouter>
       <div className="app">
         <Routes>
-          <Route path="/" element={<Navigate to="/question/1" />} />
+          <Route
+            path="/"
+            element={<Navigate to="/question/1" />}
+          />
 
           <Route
             path="/question/:number"
@@ -137,7 +140,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;
 
 export default App;
