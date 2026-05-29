@@ -32,114 +32,72 @@ function QuestionPage({ player }) {
 
         setQuestionData(data);
         setLocked(data.locked);
-
-        setStartTime(
-          data.locked ? null : Date.now()
-        );
-
+        setStartTime(data.locked ? null : Date.now());
         setElapsedTime(0);
         setResult(null);
         setHasAnswered(false);
-
       } catch (err) {
-
-        setError(
-          "Impossible de contacter le backend"
-        );
+        setError("Impossible de contacter le backend");
       }
     }
 
     loadQuestion();
-
   }, [number]);
 
   useEffect(() => {
-
-    if (
-      !startTime ||
-      hasAnswered ||
-      locked
-    ) return;
+    if (!startTime || hasAnswered || locked) return;
 
     const timer = setInterval(() => {
-
-      setElapsedTime(
-        Date.now() - startTime
-      );
-
+      setElapsedTime(Date.now() - startTime);
     }, 100);
 
     return () => clearInterval(timer);
-
   }, [startTime, hasAnswered, locked]);
 
   function formatTime(ms) {
-
     const seconds = Math.floor(ms / 1000);
-
-    const tenths = Math.floor(
-      (ms % 1000) / 100
-    );
+    const tenths = Math.floor((ms % 1000) / 100);
 
     return `${seconds}.${tenths}s`;
   }
 
   async function handleAnswer(choice) {
-
     if (locked) {
-
       setResult({
-        error:
-          "Le jeu est terminé pour aujourd'hui",
+        error: "Le jeu est terminé pour aujourd'hui",
       });
 
       return;
     }
 
-    if (
-      hasAnswered ||
-      !questionData ||
-      !startTime
-    ) return;
+    if (hasAnswered || !questionData || !startTime) return;
 
-    const finalTime =
-      Date.now() - startTime;
+    const finalTime = Date.now() - startTime;
 
     setHasAnswered(true);
     setElapsedTime(finalTime);
 
-    const response = await fetch(
-      `${API_BASE}/api/answers`,
-      {
-        method: "POST",
+    const response = await fetch(`${API_BASE}/api/answers`, {
+      method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-        body: JSON.stringify({
-          playerId: player.id,
-
-          questionNumber:
-            questionData.question.number,
-
-          dayKey: questionData.day,
-
-          answer: choice,
-
-          timeMs: finalTime,
-        }),
-      }
-    );
+      body: JSON.stringify({
+        playerId: player.id,
+        questionNumber: questionData.question.number,
+        dayKey: questionData.day,
+        answer: choice,
+        timeMs: finalTime,
+      }),
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
-
       setResult({
-        error:
-          data.error ||
-          "Erreur enregistrement",
+        error: data.error || "Erreur enregistrement",
       });
 
       return;
@@ -149,51 +107,32 @@ function QuestionPage({ player }) {
   }
 
   if (error) {
-
     return (
       <div className="card">
-
-        <img
-          src={logo}
-          alt="AQUALAND"
-          className="app-logo"
-        />
+        <img src={logo} alt="AQUALAND" className="app-logo" />
 
         <h1>AQUAQUIZZ</h1>
 
         <p>{error}</p>
-
       </div>
     );
   }
 
   if (!questionData) {
-
     return (
       <div className="card">
-
-        <img
-          src={logo}
-          alt="AQUALAND"
-          className="app-logo"
-        />
+        <img src={logo} alt="AQUALAND" className="app-logo" />
 
         <h1>AQUAQUIZZ</h1>
 
         <p>Chargement de la question...</p>
-
       </div>
     );
   }
 
   return (
     <div className="card">
-
-      <img
-        src={logo}
-        alt="AQUALAND"
-        className="app-logo"
-      />
+      <img src={logo} alt="AQUALAND" className="app-logo" />
 
       <h1>AQUAQUIZZ</h1>
 
@@ -202,59 +141,36 @@ function QuestionPage({ player }) {
       </p>
 
       {locked ? (
-
         <div className="result bad">
-
-          🔒 Le jeu est terminé
-          pour aujourd'hui.
-
+          🔒 Le jeu est terminé pour aujourd'hui.
           <br />
-
           Le classement est maintenant final.
-
         </div>
-
       ) : (
-
         <div className="chrono">
           ⏱️ {formatTime(elapsedTime)}
         </div>
-
       )}
 
-      <h2>
-        Question {questionData.question.number}
-      </h2>
+      <h2>Question {questionData.question.number}</h2>
 
       <p className="question-text">
         {questionData.question.question}
       </p>
 
       <div className="choices">
-
-        {questionData.question.choices.map(
-          (choice) => (
-
-            <button
-              key={choice}
-              onClick={() =>
-                handleAnswer(choice)
-              }
-
-              disabled={
-                hasAnswered || locked
-              }
-            >
-              {choice}
-            </button>
-
-          )
-        )}
-
+        {questionData.question.choices.map((choice) => (
+          <button
+            key={choice}
+            onClick={() => handleAnswer(choice)}
+            disabled={hasAnswered || locked}
+          >
+            {choice}
+          </button>
+        ))}
       </div>
 
       {result && (
-
         <div
           className={
             result.error
@@ -264,39 +180,25 @@ function QuestionPage({ player }) {
               : "result bad"
           }
         >
-
           {result.error ? (
-
             result.error
-
           ) : (
-
             <>
-
               {result.isCorrect
                 ? "✅ Bonne réponse !"
                 : "❌ Mauvaise réponse"}
 
               <br />
 
-              Temps :
-              {" "}
-              {formatTime(result.timeMs)}
+              Temps : {formatTime(result.timeMs)}
 
               <br />
 
-              Bonne réponse :
-              {" "}
-              {result.correctAnswer}
-
+              Bonne réponse : {result.correctAnswer}
             </>
-
           )}
-
         </div>
-
       )}
-
     </div>
   );
 }
