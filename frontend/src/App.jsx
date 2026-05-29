@@ -10,6 +10,7 @@ import "./App.css";
 
 import RegisterPage from "./pages/RegisterPage";
 import IntroPage from "./pages/IntroPage";
+import ReadyPage from "./pages/ReadyPage";
 import QuestionPage from "./pages/QuestionPage";
 import RankingPage from "./pages/RankingPage";
 import AdminPage from "./pages/AdminPage";
@@ -92,13 +93,26 @@ function App() {
     <BrowserRouter>
       <div className="app">
         <Routes>
-          <Route
-            path="/"
-            element={<Navigate to="/question/1" />}
-          />
+          <Route path="/" element={<Navigate to="/question/1" />} />
 
           <Route
             path="/question/:number"
+            element={
+              !player ? (
+                <RegisterPage onRegister={handleRegister} />
+              ) : !introSeen ? (
+                <IntroPage
+                  player={player}
+                  onStart={handleStartQuiz}
+                />
+              ) : (
+                <ReadyPage />
+              )
+            }
+          />
+
+          <Route
+            path="/question/:number/play"
             element={
               !player ? (
                 <RegisterPage onRegister={handleRegister} />
@@ -123,5 +137,7 @@ function App() {
     </BrowserRouter>
   );
 }
+
+export default App;
 
 export default App;
