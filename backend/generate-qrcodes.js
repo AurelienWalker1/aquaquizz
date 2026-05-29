@@ -2,7 +2,7 @@ const QRCode = require("qrcode");
 const fs = require("fs");
 const path = require("path");
 
-const BASE_URL = "http://192.168.1.19:5174";
+const BASE_URL = "https://voluble-pasca-48217d.netlify.app";
 
 const outputDir = path.join(__dirname, "qrcodes");
 
