@@ -45,6 +45,14 @@ function checkAdminPassword(req, res, next) {
   next();
 }
 
+function escapeCsv(value) {
+  if (value === null || value === undefined) return "";
+
+  const stringValue = String(value).replace(/"/g, '""');
+
+  return `"${stringValue}"`;
+}
+
 const db = new sqlite3.Database("./aquaquizz.sqlite", (err) => {
   if (err) {
     console.error("❌ Erreur SQLite :", err.message);
@@ -211,7 +219,13 @@ app.post("/api/answers", (req, res) => {
 
   const { playerId, questionNumber, dayKey, answer, timeMs } = req.body;
 
-  if (!playerId || !questionNumber || !dayKey || !answer || timeMs === undefined) {
+  if (
+    !playerId ||
+    !questionNumber ||
+    !dayKey ||
+    !answer ||
+    timeMs === undefined
+  ) {
     return res.status(400).json({
       error: "Données manquantes",
     });
@@ -433,6 +447,74 @@ app.put(
         success: true,
       });
     });
+  }
+);
+
+app.get(
+  "/api/admin/export-players",
+  checkAdminPassword,
+  (req, res) => {
+    db.all(
+      `
+      SELECT
+        players.firstname,
+        players.email,
+        players.phone,
+        players.created_at,
+        COUNT(answers.id) AS total_answers,
+        SUM(answers.is_correct) AS correct_answers,
+        SUM(answers.time_ms) AS total_time_ms
+      FROM players
+      LEFT JOIN answers ON answers.player_id = players.id
+      GROUP BY players.id
+      ORDER BY players.created_at DESC
+      `,
+      [],
+      (err, rows) => {
+        if (err) {
+          return res.status(500).json({
+            error: "Erreur export participants",
+          });
+        }
+
+        const headers = [
+          "Prénom",
+          "Email",
+          "Téléphone",
+          "Date inscription",
+          "Réponses données",
+          "Bonnes réponses",
+          "Temps total ms",
+        ];
+
+        const csvRows = rows.map((row) => [
+          escapeCsv(row.firstname),
+          escapeCsv(row.email),
+          escapeCsv(row.phone),
+          escapeCsv(row.created_at),
+          escapeCsv(row.total_answers || 0),
+          escapeCsv(row.correct_answers || 0),
+          escapeCsv(row.total_time_ms || 0),
+        ]);
+
+        const csvContent = [
+          headers.map(escapeCsv).join(";"),
+          ...csvRows.map((row) => row.join(";")),
+        ].join("\n");
+
+        const filename = `aquaquizz_participants_${new Date()
+          .toISOString()
+          .slice(0, 10)}.csv`;
+
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${filename}"`
+        );
+
+        res.send("\uFEFF" + csvContent);
+      }
+    );
   }
 );
 
