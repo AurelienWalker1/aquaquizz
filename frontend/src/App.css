@@ -505,6 +505,28 @@ button:disabled {
   margin-bottom: 18px;
 }
 
+.export-button {
+
+  background:
+    linear-gradient(
+      135deg,
+      #06d6a0,
+      #00b4d8
+    );
+
+  margin-bottom: 18px;
+}
+
+.export-button:hover {
+
+  background:
+    linear-gradient(
+      135deg,
+      #05b98a,
+      #0096c7
+    );
+}
+
 /* LIVE */
 
 .live-page {
@@ -765,7 +787,19 @@ button:disabled {
   }
 
   .live-header h1 {
-    font-size: 42px;
+    font-size: 48px;
+    line-height: 0.95;
+    text-align: center;
+    max-width: 340px;
+    margin: 0 auto 35px;
+    letter-spacing: -2px;
+  }
+
+  .live-timer {
+    font-size: 34px;
+    line-height: 0.95;
+    padding: 22px;
+    max-width: 270px;
   }
 
   .live-ranking-row {
