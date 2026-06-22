@@ -122,6 +122,49 @@ function AdminPage() {
     }
   }
 
+  async function exportPlayers() {
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/admin/export-players`,
+        {
+          headers: {
+            "x-admin-password": adminPassword,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        setMessage(data.error || "❌ Erreur export participants");
+        return;
+      }
+
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+
+      link.download = `aquaquizz_participants_${new Date()
+        .toISOString()
+        .slice(0, 10)}.csv`;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+
+      setMessage("✅ Export participants téléchargé");
+    } catch (err) {
+      setMessage("❌ Impossible de télécharger l’export");
+    }
+  }
+
   async function resetGame() {
     const confirmReset = window.confirm(
       "Voulez-vous vraiment réinitialiser AQUAQUIZZ ?"
@@ -192,6 +235,13 @@ function AdminPage() {
           onClick={logout}
         >
           Déconnexion admin
+        </button>
+
+        <button
+          className="export-button"
+          onClick={exportPlayers}
+        >
+          📥 Télécharger les participants
         </button>
 
         <select
